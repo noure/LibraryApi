@@ -2,6 +2,20 @@ var express=require('express');
 
 var routes=function (Entity) {
   var router=express.Router();
+
+
+//the next callback method can be any of GET DELET POST PUT OR PATCH
+  router.use('/:entityId',function (req,res,next) {
+    Entity.findById(req.params.entityId,function (err,result) {
+      if(err) res.status(500).send(err);
+      else if (result) {
+          req.book=result;
+          next();
+      }{
+        res.status(404).send("no such entity exist in the database");
+      }
+    });
+  })
   router.route('/')
             .post(function (req,res) {
               var entity=new Entity(req.body);
@@ -23,26 +37,17 @@ var routes=function (Entity) {
             });
   router.route('/:entityId')
             .get(function (req,res) {
-              Entity.findById(req.params.entityId,function (err,result) {
-                if(err) res.status(500).send(err);
-                else {
-                  res.status(201).send(result);
-                }
-              })
+                res.status(201).send(req.book);
             })
             .put(function (req,res) {
-              Entity.findById(req.params.entityId,function (err,result) {
-                if(err) res.status(500).send(err);
-                else {
-
-                  for( prop in req.body){
-                    result[prop]=req.body[prop];
+                 for( prop in req.body){
+                    req.book[prop]=req.body[prop];
                   }
-                  result.save();
-                  res.status(201).send(result);
-                }
-              })
-            });
+                  req.book.save();
+                  res.status(201).send(req.book);
+                });
+
+
 
             return router;
   }
