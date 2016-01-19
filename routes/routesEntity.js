@@ -43,9 +43,34 @@ var routes=function (Entity) {
                  for( prop in req.body){
                     req.book[prop]=req.body[prop];
                   }
-                  req.book.save();
-                  res.status(201).send(req.book);
-                });
+                  req.book.save(function(err){
+                    if(err) res.status(404).send('something goes wrong');
+                    else {
+                      res.status(201).json(req.book);
+                    }
+                  });
+
+                })
+            .patch(function (req,res) {
+              for( prop in req.body){
+                 req.book[prop]=req.body[prop];
+               }
+               req.book.save(function(err){
+                 if(err) res.status(404).send(err);
+                 else {
+                   res.status(201).json(req.book);
+                 }
+               });
+
+            })
+            .delete(function (req,res) {
+              req.book.remove(function (err) {
+                if(err) res.status(404).send(err);
+                else {
+                  res.status(204).send('successfuly removed')
+                }
+              })
+            });
 
 
 
